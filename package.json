@@ -1,0 +1,18 @@
+{
+  "name": "famnm-website-backend",
+  "version": "1.0.0",
+  "description": "the backend for https://famnm.club",
+  "main": "app.js",
+  "scripts": {
+    "test": "test"
+  },
+  "keywords": [
+    "express",
+    "famnm"
+  ],
+  "author": "FIRST Alumni and Mentors Network at Michigan",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
