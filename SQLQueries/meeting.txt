@@ -1,0 +1,49 @@
+---------------------------------------------------------------
+| meetingID | type | date | startTime | endTime | description |
+---------------------------------------------------------------
+
+// Create table
+CREATE TABLE MEETING (
+	MEETING_ID NUMBER PRIMARY KEY,
+	TYPE VARCHAR2(20) NOT NULL,
+	DAY DATE NOT NULL,
+	START_TIME TIME NOT NULL,
+	END_TIME TIME NOT NULL,
+	DESCRIPTION VARCHAR2(1000),
+	FOREIGN KEY (TYPE) REFERENCES MEETING_TYPE(TYPE)
+);
+
+// Insert entry
+INSERT INTO MEETING 
+	(MEETING_ID, TYPE, DAY, START_TIME, END_TIME, DESCRIPTION);
+
+// Get all meetings
+SELECT * FROM MEETING;
+
+// Get meetings on a certain day
+SELECT * 
+	FROM MEETING
+	WHERE DAY = d;
+
+// Get meetings in a date range
+SELECT *
+	FROM MEETING
+	WHERE DAY GE start_day AND
+		DAY LE end_day;
+
+// Get all meetings of a certain type
+SELECT * 
+	FROM MEETING
+	WHERE TYPE = t;
+
+// Update a meeting
+UPDATE MEETING
+SET TYPE = t,
+	DAY = d,
+	START_TIME = s,
+	END_TIME = e,
+	DESCRIPTION = desc
+WHERE MEETING_ID = id;
+
+// Delete a meeting
+DELETE FROM MEETING WHERE MEETING_ID = id;

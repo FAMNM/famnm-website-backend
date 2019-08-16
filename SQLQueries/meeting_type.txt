@@ -1,0 +1,18 @@
+-----------
+|  type   |  
+-----------
+
+// Create table
+CREATE TABLE MEETING_TYPE (
+	PRIMARY KEY TYPE VARCHAR2(22)
+);
+
+// Insert entry
+INSERT INTO MEETING_TYPE (TYPE);
+
+// Get all meeting types
+SELECT TYPE FROM MEETING_TYPE;
+
+// Delete a specific entry
+DELETE FROM MEETING_TYPE
+	WHERE TYPE = t;
