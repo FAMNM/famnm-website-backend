@@ -1,0 +1,32 @@
+----------------------------------
+|  uniquename   |   meetingID    |
+----------------------------------
+
+// Create table
+CREATE TABLE ATTENDANCE (
+	UNIQUENAME VARCHAR2(10) NOT NULL,
+	MEETING_ID NUMBER NOT NULL,
+	PRIMARY KEY (UNIQUENAME, MEETINGID),
+	FOREIGN KEY (MEETING_ID) REFERENCES MEETING(MEETING_ID)
+);
+
+// Insert entry
+INSERT INTO ATTENDANCE (UNIQUENAME, MEETING_ID);
+
+// Get all meetingIDs a member attended
+SELECT MEETING_ID
+	FROM ATTENDANCE
+	WHERE UNIQUENAME = u;
+
+// Get all members that were at a meetingID
+SELECT UNIQUENAME
+	FROM ATTENDANCE
+	WHERE MEETING_ID = id;
+
+// Since both fields in the table are the PK, no need for update
+
+// Delete a specific entry
+DELETE FROM ATTENDANCE
+	WHERE UNIQUENAME = u AND MEETING_ID = id;
+
+
