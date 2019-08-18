@@ -1,6 +1,6 @@
-const { Client } = require('pg');
+const { Pool } = require('pg');
 
-const client = new Client({
+const pool = new Pool({
 	connectionString: process.env.DATABASE_URL,
 	ssl: true,
 });
@@ -8,15 +8,10 @@ const client = new Client({
 
 module.exports = {
 	meeting_types: () => {
-		client.connect();
-		return client
+		return pool
 			.query('SELECT * FROM MEETING_TYPE;')
-			.then(res => {
-				client.end();
-				return res.rows;
-			})
+			.then(res => res.rows)
 			.catch(e => {
-				client.end();
 				throw e;
 			});
 	}
