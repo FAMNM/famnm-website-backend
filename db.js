@@ -11,7 +11,13 @@ module.exports = {
 		client.connect();
 		client
 			.query('SELECT * FROM MEETING_TYPE;')
-			.then(res => res.rows)
-			.catch(e => {throw e;});
+			.then(res => {
+				client.end();
+				return res.rows;
+			})
+			.catch(e => {
+				client.end();
+				throw e;
+			});
 	}
 }
