@@ -10,9 +10,9 @@ module.exports = {
 	meeting_types: () => {
 		client.connect();
 		client.query('SELECT * FROM MEETING_TYPE;', (err, res) => {
+			client.end();
 			if (err) throw err;
 			return res;
-			client.end();
 		});
 	}
 }
