@@ -9,14 +9,9 @@ const client = new Client({
 module.exports = {
 	meeting_types: () => {
 		client.connect();
-		var result;
-		client.query('SELECT * FROM MEETING_TYPE;', (err, res) => {
-			if (err !== null) {
-				throw err;
-			}
-			result = res.rows;
-		});
-		client.end();
-		return result;
+		client
+			.query('SELECT * FROM MEETING_TYPE;')
+			.then(res => res.rows)
+			.catch(e => {throw e;});
 	}
 }
