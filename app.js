@@ -8,7 +8,7 @@ const port = process.env.PORT || 8000;
 app.get('/test', (req, res) => res.send('Hello! This is the FAMNM Backend.'));
 app.get('/meeting_types', async (req, res) => {
 	try {
-		const { rows } = await db.meeting_types();
+		const rows = await db.meeting_types();
 		res.send(rows);
 	} catch (e) {
 		res.status(500).send({error: 'something went wrong.', object: e});
