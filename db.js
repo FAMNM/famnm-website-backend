@@ -11,6 +11,8 @@ module.exports = {
 		client.connect();
 		client.query('SELECT * FROM MEETING_TYPE;', (err, res) => {
 			client.end();
+			console.log(res);
+			console.log(err);
 			if (err) throw err;
 			return res;
 		});
