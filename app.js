@@ -11,7 +11,7 @@ app.get('/meeting_types', async (req, res) => {
 		const { rows } = await db.meeting_types();
 		res.send(rows);
 	} catch (e) {
-		res.status(500).send({error: 'something went wrong.'});
+		res.status(500).send({error: 'something went wrong.', object: e});
 	}
 });
 
