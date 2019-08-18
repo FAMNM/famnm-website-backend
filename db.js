@@ -13,7 +13,10 @@ module.exports = {
 			client.end();
 			console.log(res);
 			console.log(err);
-			if (err) throw err;
+			if (err !== null) 
+			{
+				throw err;
+			}
 			return res;
 		});
 	}
