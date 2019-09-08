@@ -1,6 +1,7 @@
 const { Pool } = require('pg');
 const meetings = require('./meetings.js');
 const meeting_types = require('./meeting_types.js');
+const attendance = require('./attendance.js');
 
 const pool = new Pool({
 	connectionString: process.env.DATABASE_URL,
@@ -19,6 +20,12 @@ module.exports = {
 	},
 	get_all_meeting_types: () => {
 		return module.exports.query({text: meeting_types.get_all_meeting_types});
+	},
+	create_meeting_type: (type) => {
+		return module.exports.query({text: meeting_types.create_meeting_type, values: [type]});
+	},
+	delete_meeting_type: (type) => {
+		return module.exports.query({text: meeting_types.create_meeting_type, values: [type]});
 	},
 	create_meeting: (new_meeting) => {
 		return module.exports.query({text: meetings.create_meeting, values: new_meeting});
@@ -41,4 +48,16 @@ module.exports = {
 	delete_meeting: (id) => {
 		return module.exports.query({text: meetings.delete_meeting, values: [id]});
 	},
+	create_attendance_entry: (entry) => {
+		return module.exports.query({text: attendance.create_attendance_entry, values: entry});
+	},
+	get_attendance_for_uniqname: (uniqname) => {
+		return module.exports.query({text: attendance.get_attendance_for_uniqname, values: [uniqname]});
+	},
+	get_attendance_for_meeting: (meeting_id) => {
+		return module.exports.query({text: attendance.get_attendance_for_meeting, values: [meeting_id]});
+	},
+	delete_attendance_entry: (entry) => {
+		return module.exports.query({text: attendance.delete_attendance_entry, values: entry});
+	}
 }
