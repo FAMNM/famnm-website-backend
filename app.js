@@ -5,7 +5,7 @@ const db = require('./db/db.js');
 const app = express();
 const port = process.env.PORT || 8000;
 
-app.get('/test', (req, res) => res.send('Hello! This is the FAMNM Backend.'));
+app.get('/test', (req, res) => res.send('Hello! This is the FAMNM Backend. Pls no DDOS.'));
 app.get('/meeting_types', async (req, res) => {
 	db.get_all_meeting_types()
 	.then(rows => {
