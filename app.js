@@ -6,7 +6,7 @@ const app = express();
 const port = process.env.PORT || 8000;
 
 function getRequest(getfunction, data, res) {
-	const func = null;
+	var func = null;
 	if (data) {
 		func = getfunction(data);
 	} else {
