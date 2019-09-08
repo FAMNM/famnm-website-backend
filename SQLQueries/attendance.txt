@@ -1,26 +1,26 @@
 ----------------------------------
-|  uniquename   |   meetingID    |
+|  uniqname   |   meetingID    |
 ----------------------------------
 
 // Create table
 CREATE TABLE ATTENDANCE (
-	UNIQUENAME VARCHAR(10) NOT NULL,
+	UNIQNAME VARCHAR(10) NOT NULL,
 	MEETING_ID INT NOT NULL,
-	PRIMARY KEY (UNIQUENAME, MEETING_ID),
+	PRIMARY KEY (UNIQNAME, MEETING_ID),
 	FOREIGN KEY (MEETING_ID) REFERENCES MEETING(MEETING_ID)
 );
 
 // Insert entry
-INSERT INTO ATTENDANCE (UNIQUENAME, MEETING_ID)
+INSERT INTO ATTENDANCE (UNIQNAME, MEETING_ID)
 	VALUES (u, id);
 
 // Get all meetingIDs a member attended
 SELECT MEETING_ID
 	FROM ATTENDANCE
-	WHERE UNIQUENAME = u;
+	WHERE UNIQNAME = u;
 
 // Get all members that were at a meetingID
-SELECT UNIQUENAME
+SELECT UNIQNAME
 	FROM ATTENDANCE
 	WHERE MEETING_ID = id;
 
@@ -28,6 +28,6 @@ SELECT UNIQUENAME
 
 // Delete a specific entry
 DELETE FROM ATTENDANCE
-	WHERE UNIQUENAME = u AND MEETING_ID = id;
+	WHERE UNIQNAME = u AND MEETING_ID = id;
 
 
