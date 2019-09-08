@@ -14,23 +14,50 @@ function getRequest(getfunction, res, data) {
 	}
 	func.then(rows => {
 		res.send(rows);
-	})
-	.catch(e => {
+	}).catch(e => {
 		res.status(500).send({error: 'something went wrong.', object: e});
 	});
 }
 
 app.get('/test', (req, res) => res.send('Hello! This is the FAMNM Backend. Pls no DDOS.'));
+
+/*
+*****************
+* MEETING TYPES *
+*****************
+*/
+
 app.get('/meeting_types', async (req, res) => {
 	getRequest(db.get_all_meeting_types, res);
 });
+
+/*
+************
+* MEETINGS *
+************
+*/
+
+app.get('/get_all_meetings', async (req, res) => {
+	getRequest(db.get_all_meetings, res);
+});
+
+app.get('/get_meetings_on_day', async(req, res) => {
+	getRequest(db.get_meetings_on_day, res, Date.parse(req.query.day));
+});
+
+app.get('/get_meetings_within_day_range', async(req, res) => {
+	getRequest(db.get_meetings_within_day_range, res, [Date.parse(req.query.start), Date.parse(req.query.end)]);
+});
+/*
+**************
+* ATTENDANCE *
+**************
+*/
+
 /*
 ***
 GET
 ***
-get_all_meetings
-get_meetings_on_day
-get_meetings_within_day_range
 get_meetings_of_type
 get_attendance_for_uniqname
 get_attendance_for_meeting
