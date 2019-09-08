@@ -5,7 +5,7 @@ const db = require('./db/db.js');
 const app = express();
 const port = process.env.PORT || 8000;
 
-function getRequest(getfunction, data, res) {
+function getRequest(getfunction, res, data) {
 	var func = null;
 	if (data) {
 		func = getfunction(data);
@@ -22,7 +22,7 @@ function getRequest(getfunction, data, res) {
 
 app.get('/test', (req, res) => res.send('Hello! This is the FAMNM Backend. Pls no DDOS.'));
 app.get('/meeting_types', async (req, res) => {
-	getRequest(db.get_all_meeting_types, null, res);
+	getRequest(db.get_all_meeting_types, res);
 });
 /*
 ***
