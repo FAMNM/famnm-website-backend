@@ -8,6 +8,7 @@ app.use(express.json());
 const port = process.env.PORT || 8000;
 
 function dbRequest(fn, res, data) {
+	console.log("data to send to db: " + JSON.stringify(data));
 	var func = null;
 	if (data) {
 		func = fn(data);
