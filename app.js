@@ -48,7 +48,7 @@ app.delete('/meeting_type', async(req, res) => {
 ************
 */
 app.get('/meeting/:meetingId', async (req, res) => {
-	dbRequest(db.get_all_meetings, res, req.params.meetingId);
+	dbRequest(db.get_meeting_with_id, res, req.params.meetingId);
 });
 
 app.get('/meeting', async (req, res) => {
