@@ -18,6 +18,11 @@ module.exports = {
 				throw e;
 			})
 	},
+	/*
+	*****************
+	* MEETING TYPES *
+	*****************
+	*/
 	get_all_meeting_types: () => {
 		return module.exports.query({text: meeting_types.get_all_meeting_types});
 	},
@@ -27,8 +32,13 @@ module.exports = {
 	delete_meeting_type: (type) => {
 		return module.exports.query({text: meeting_types.create_meeting_type, values: [type]});
 	},
-	create_meeting: (new_meeting) => {
-		return module.exports.query({text: meetings.create_meeting, values: new_meeting});
+	/*
+	************
+	* MEETINGS *
+	************
+	*/
+	get_meeting_with_id: (id) => {
+		return module.exports.query({text: meetings.get_meeting_with_id, values: [id]});
 	},
 	get_all_meetings: () => {
 		return module.exports.query({text: meetings.get_all_meetings});
@@ -42,20 +52,28 @@ module.exports = {
 	get_meetings_of_type: (type) => {
 		return module.exports.query({text: meetings.get_meetings_of_type, values: [type]});
 	},
+	create_meeting: (new_meeting) => {
+		return module.exports.query({text: meetings.create_meeting, values: new_meeting});
+	},
 	update_meeting: (new_info) => {
 		return module.exports.query({text: meetings.update_meeting, values: new_info});
 	},
 	delete_meeting: (id) => {
 		return module.exports.query({text: meetings.delete_meeting, values: [id]});
 	},
-	create_attendance_entry: (entry) => {
-		return module.exports.query({text: attendance.create_attendance_entry, values: entry});
-	},
+	/*
+	**************
+	* ATTENDANCE *
+	**************
+	*/
 	get_attendance_for_uniqname: (uniqname) => {
 		return module.exports.query({text: attendance.get_attendance_for_uniqname, values: [uniqname]});
 	},
 	get_attendance_for_meeting: (meeting_id) => {
 		return module.exports.query({text: attendance.get_attendance_for_meeting, values: [meeting_id]});
+	},
+	create_attendance_entry: (entry) => {
+		return module.exports.query({text: attendance.create_attendance_entry, values: entry});
 	},
 	delete_attendance_entry: (entry) => {
 		return module.exports.query({text: attendance.delete_attendance_entry, values: entry});

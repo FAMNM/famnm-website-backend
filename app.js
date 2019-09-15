@@ -3,14 +3,16 @@ const db = require('./db/db.js');
 
 
 const app = express();
+app.use(express.json());
+
 const port = process.env.PORT || 8000;
 
-function getRequest(getfunction, res, data) {
+function dbRequest(fn, res, data) {
 	var func = null;
 	if (data) {
-		func = getfunction(data);
+		func = fn(data);
 	} else {
-		func = getfunction();
+		func = fn();
 	}
 	func.then(rows => {
 		res.send(rows);
@@ -27,8 +29,16 @@ app.get('/test', (req, res) => res.send('Hello! This is the FAMNM Backend. Pls n
 *****************
 */
 
-app.get('/meeting_types', async (req, res) => {
-	getRequest(db.get_all_meeting_types, res);
+app.get('/meeting_type', async (req, res) => {
+	dbRequest(db.get_all_meeting_types, res);
+});
+
+app.post('/meeting_type', async(req, res) => {
+	dbRequest(db.create_meeting_type, res, req.body.meetingType);
+});
+
+app.delete('/meeting_type', async(req, res) => {
+	dbRequest(db.delete_meeting_type, res, req.body.meetingType);
 });
 
 /*
@@ -36,53 +46,60 @@ app.get('/meeting_types', async (req, res) => {
 * MEETINGS *
 ************
 */
-
-app.get('/get_all_meetings', async (req, res) => {
-	getRequest(db.get_all_meetings, res);
+app.get('/meeting/:meetingId', async (req, res) => {
+	dbRequest(db.get_all_meetings, res, req.params.meetingId);
 });
 
-app.get('/get_meetings_on_day', async(req, res) => {
-	getRequest(db.get_meetings_on_day, res, Date.parse(req.query.day));
+app.get('/meeting', async (req, res) => {
+	dbRequest(db.get_all_meetings, res);
 });
 
-app.get('/get_meetings_within_day_range', async(req, res) => {
-	getRequest(db.get_meetings_within_day_range, res, [Date.parse(req.query.start), Date.parse(req.query.end)]);
+// ANYBODY MAKING REQUESTS MUST USE Date.getTime();
+
+app.get('/meeting/day/:meetingDay', async(req, res) => {
+	dbRequest(db.get_meetings_on_day, res, new Date(req.params.meetingDay));
 });
+
+app.get('/meeting/start/:startDay/end/:endDay', async(req, res) => {
+	dbRequest(db.get_meetings_within_day_range, res, [new Date(req.params.startDay), new Date(req.params.endDay)]);
+});
+
+app.get('/meeting/type/:meetingType', async(req, res) => {
+	dbRequest(db.get_meetings_of_type, res, req.params.meetingType);
+});
+
+app.post('/meeting', async(req, res) => {
+	dbRequest(db.create_meeting, res, [req.body.meetingType, req.body.meetingDay, req.body.startTime, req.body.endTime, req.body.description]);
+});
+
+app.put('/meeting', async(req, res) => {
+	dbRequest(db.update_meeting, res, [req.body.meetingType, req.body.meetingDay, req.body.startTime, req.body.endTime, req.body.description, req.body.meetingId]);
+});
+
+app.delete('/meeting', async(req, res) => {
+	dbRequest(db.delete_meeting, res, req.body.meetingId);
+});
+
+
 /*
 **************
 * ATTENDANCE *
 **************
 */
+app.get('/attendance/uniqname/:uniqname', async(req, res) => {
+	dbRequest(db.get_attendance_for_uniqname, res, req.params.uniqname);
+});
 
-/*
-***
-GET
-***
-get_meetings_of_type
-get_attendance_for_uniqname
-get_attendance_for_meeting
+app.get('/attendance/meeting/:meetingId', async(req, res) => {
+	dbRequest(db.get_attendance_for_meeting, res, req.params.meetingId);
+});
 
-***
-POST
-***
-create_meeting_type
-create_meeting
-create_attendance_entry
+app.post('/attendance', async(req, res) => {
+	dbRequest(db.create_attendance_entry, res, [req.body.uniqname, req.body.meetingId]);
+});
 
-
-***
-PUT
-***
-update_meeting
-
-
-***
-DELETE
-***
-delete_meeting_type
-delete_meeting
-delete_attendance_entry
-
-*/
+app.delete('/attendance', async(req, res) => {
+	dbRequest(db.delete_attendance_entry, res, [req.body.uniqname, req.body.meetingId]);
+});
 app.listen(port, () => console.log(`app listening at https:\/\/localhost:${port}!`))
 
