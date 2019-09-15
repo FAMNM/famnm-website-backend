@@ -30,7 +30,7 @@ module.exports = {
 		return module.exports.query({text: meeting_types.create_meeting_type, values: [type]});
 	},
 	delete_meeting_type: (type) => {
-		return module.exports.query({text: meeting_types.create_meeting_type, values: [type]});
+		return module.exports.query({text: meeting_types.delete_meeting_type, values: [type]});
 	},
 	/*
 	************
