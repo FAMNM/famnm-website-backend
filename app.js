@@ -8,7 +8,6 @@ app.use(express.json());
 const port = process.env.PORT || 8000;
 
 function dbRequest(fn, res, data) {
-	console.log("data to send to db: " + JSON.stringify(data));
 	var func = null;
 	if (data) {
 		func = fn(data);
@@ -20,6 +19,11 @@ function dbRequest(fn, res, data) {
 	}).catch(e => {
 		res.status(500).send({error: 'something went wrong.', object: e});
 	});
+}
+
+function parseDate(dateString)
+{
+	return new Date(parseInt(dateString));
 }
 
 app.get('/test', (req, res) => res.send('Hello! This is the FAMNM Backend. Pls no DDOS.'));
@@ -58,11 +62,11 @@ app.get('/meeting', async (req, res) => {
 // ANYBODY MAKING REQUESTS MUST USE Date.getTime();
 
 app.get('/meeting/day/:meetingDay', async(req, res) => {
-	dbRequest(db.get_meetings_on_day, res, new Date(req.params.meetingDay));
+	dbRequest(db.get_meetings_on_day, res, parseDate(req.params.meetingDay));
 });
 
 app.get('/meeting/start/:startDay/end/:endDay', async(req, res) => {
-	dbRequest(db.get_meetings_within_day_range, res, [new Date(req.params.startDay), new Date(req.params.endDay)]);
+	dbRequest(db.get_meetings_within_day_range, res, [parseDate(req.params.startDay), parseDate(req.params.endDay)]);
 });
 
 app.get('/meeting/type/:meetingType', async(req, res) => {
@@ -70,13 +74,13 @@ app.get('/meeting/type/:meetingType', async(req, res) => {
 });
 
 app.post('/meeting', async(req, res) => {
-	dbRequest(db.create_meeting, res, [req.body.meetingType, new Date(req.body.meetingDay), req.body.startTime, req.body.endTime, req.body.description]);
+	dbRequest(db.create_meeting, res, [req.body.meetingType, parseDate(req.body.meetingDay), req.body.startTime, req.body.endTime, req.body.description]);
 });
 
 // time is a string, in 24 hour time, e.g. 15:04. HH:MM.
 
 app.put('/meeting', async(req, res) => {
-	dbRequest(db.update_meeting, res, [req.body.meetingType, new Date(req.body.meetingDay), req.body.startTime, req.body.endTime, req.body.description, req.body.meetingId]);
+	dbRequest(db.update_meeting, res, [req.body.meetingType, parseDate(req.body.meetingDay), req.body.startTime, req.body.endTime, req.body.description, req.body.meetingId]);
 });
 
 app.delete('/meeting', async(req, res) => {
