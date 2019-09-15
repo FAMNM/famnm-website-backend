@@ -70,11 +70,13 @@ app.get('/meeting/type/:meetingType', async(req, res) => {
 });
 
 app.post('/meeting', async(req, res) => {
-	dbRequest(db.create_meeting, res, [req.body.meetingType, req.body.meetingDay, req.body.startTime, req.body.endTime, req.body.description]);
+	dbRequest(db.create_meeting, res, [req.body.meetingType, new Date(req.body.meetingDay), req.body.startTime, req.body.endTime, req.body.description]);
 });
 
+// time is a string, in 24 hour time, e.g. 15:04. HH:MM.
+
 app.put('/meeting', async(req, res) => {
-	dbRequest(db.update_meeting, res, [req.body.meetingType, req.body.meetingDay, req.body.startTime, req.body.endTime, req.body.description, req.body.meetingId]);
+	dbRequest(db.update_meeting, res, [req.body.meetingType, new Date(req.body.meetingDay), req.body.startTime, req.body.endTime, req.body.description, req.body.meetingId]);
 });
 
 app.delete('/meeting', async(req, res) => {
