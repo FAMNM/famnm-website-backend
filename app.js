@@ -1,16 +1,19 @@
 const express = require('express');
-// const cors = require('cors');
+const cors = require('cors');
 const db = require('./db/db.js');
 
-// var corsOptions = {
-// 	origin: 'https://famnm.club',
-// 	optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-// }
+var corsOptions = {
+	origin: 'https://famnm.club',
+	optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+}
 
 
 const app = express();
 app.use(express.json());
-// app.use(cors(corsOptions));
+
+if (process.env.CORS_ENABLED == "TRUE") {
+	app.use(cors(corsOptions));
+}
 
 const port = process.env.PORT || 8000;
 
@@ -28,12 +31,11 @@ function dbRequest(fn, res, data) {
 	});
 }
 
-function parseDate(dateString)
-{
+function parseDate(dateString) {
 	return new Date(parseInt(dateString));
 }
 
-app.get('/test', (req, res) => res.send('Hello! This is the FAMNM Backend. Pls no DDOS.'));
+app.get('/', (req, res) => res.send('Hello World! This is the FAMNM Backend.'));
 
 /*
 *****************
@@ -73,7 +75,8 @@ app.get('/meeting/day/:meetingDay', async(req, res) => {
 });
 
 app.get('/meeting/start/:startDay/end/:endDay', async(req, res) => {
-	dbRequest(db.get_meetings_within_day_range, res, [parseDate(req.params.startDay), parseDate(req.params.endDay)]);
+	dbRequest(db.get_meetings_within_day_range, res, [parseDate(req.params.startDay),
+													  parseDate(req.params.endDay)]);
 });
 
 app.get('/meeting/type/:meetingType', async(req, res) => {
@@ -81,13 +84,22 @@ app.get('/meeting/type/:meetingType', async(req, res) => {
 });
 
 app.post('/meeting', async(req, res) => {
-	dbRequest(db.create_meeting, res, [req.body.meetingType, parseDate(req.body.meetingDay), req.body.startTime, req.body.endTime, req.body.description]);
+	dbRequest(db.create_meeting, res, [req.body.meetingType, 
+									   parseDate(req.body.meetingDay),
+									   req.body.startTime,
+									   req.body.endTime,
+									   req.body.description]);
 });
 
 // time is a string, in 24 hour time, e.g. 15:04. HH:MM.
 
 app.put('/meeting', async(req, res) => {
-	dbRequest(db.update_meeting, res, [req.body.meetingType, parseDate(req.body.meetingDay), req.body.startTime, req.body.endTime, req.body.description, req.body.meetingId]);
+	dbRequest(db.update_meeting, res, [req.body.meetingType,
+									   parseDate(req.body.meetingDay),
+									   req.body.startTime,
+									   req.body.endTime,
+									   req.body.description,
+									   req.body.meetingId]);
 });
 
 app.delete('/meeting', async(req, res) => {
