@@ -11,7 +11,10 @@ var corsOptions = {
 const app = express();
 app.use(express.json());
 
-if (process.env.CORS_ENABLED == "TRUE") {
+if (process.env.CORS_ENABLED == "TEST")
+{
+	app.use(cors());
+} else if (process.env.CORS_ENABLED == "TRUE") {
 	app.use(cors(corsOptions));
 }
 
