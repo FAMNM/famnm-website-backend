@@ -30,4 +30,5 @@ SELECT UNIQNAME
 DELETE FROM ATTENDANCE
 	WHERE UNIQNAME = u AND MEETING_ID = id;
 
-
+// Get "active members" (4 or more meetings)
+SELECT uniqname, COUNT(*) FROM attendance GROUP BY uniqname HAVING COUNT(*) > 3;

@@ -123,6 +123,10 @@ app.get('/attendance/meeting/:meetingId', async(req, res) => {
 	dbRequest(db.get_attendance_for_meeting, res, req.params.meetingId);
 });
 
+app.get('/attendance/active', async (req, res) => {
+	dbRequest(db.get_active_member_uniqnames, res);
+});
+
 app.post('/attendance', async(req, res) => {
 	dbRequest(db.create_attendance_entry, res, [req.body.uniqname, req.body.meetingId]);
 });
