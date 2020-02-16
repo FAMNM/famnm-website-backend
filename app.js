@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const db = require('./db/db.js');
+const stringify = require('csv-stringify');
 
 var corsOptions = {
 	origin: 'https://famnm.club',
@@ -134,5 +135,23 @@ app.post('/attendance', async(req, res) => {
 app.delete('/attendance', async(req, res) => {
 	dbRequest(db.delete_attendance_entry, res, [req.body.uniqname, req.body.meetingId]);
 });
+
+/*
+**************
+* CSV EXPORT *
+**************
+*/
+app.get('/export', async(req, res) => {
+	db.get_csv_export_data().then(rows => {
+		res.setHeader('Content-Type', 'text/csv');
+		res.setHeader('Content-Disposition', 'attachment; filename=\"' + 'famnm-attendance-' + Date.now() + '.csv\"');
+		res.setHeader('Cache-Control', 'no-cache');
+		res.setHeader('Pragma', 'no-cache');
+
+		stringify(rows, { header: true })
+		.pipe(res);	  
+	})
+})
+
 app.listen(port, () => console.log(`app listening at https:\/\/localhost:${port}!`))
 
