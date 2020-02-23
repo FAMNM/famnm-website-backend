@@ -30,4 +30,14 @@ SELECT UNIQNAME
 DELETE FROM ATTENDANCE
 	WHERE UNIQNAME = u AND MEETING_ID = id;
 
+// Get "active members" (4 or more meetings)
+SELECT uniqname, COUNT(*) FROM attendance GROUP BY uniqname HAVING COUNT(*) > 3;
 
+// view for exporting to CSV
+CREATE VIEW CSV_VIEW AS
+select A.UNIQNAME, M.TYPE AS MEETING_TYPE, M.DAY AS DATE, M.DESCRIPTION 
+FROM ATTENDANCE A, MEETING M 
+WHERE A.MEETING_ID = M.MEETING_ID ORDER BY A.UNIQNAME;
+
+// get everything from the view
+SELECT * FROM CSV_VIEW;

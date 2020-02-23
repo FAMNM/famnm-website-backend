@@ -77,5 +77,11 @@ module.exports = {
 	},
 	delete_attendance_entry: (entry) => {
 		return module.exports.query({text: attendance.delete_attendance_entry, values: entry});
+	},
+	get_active_member_uniqnames: () => {
+		return module.exports.query({text: attendance.get_active_member_uniqnames});
+	},
+	get_csv_export_data: () => {
+		return module.exports.query({text: attendance.get_csv_export_data});
 	}
 }
