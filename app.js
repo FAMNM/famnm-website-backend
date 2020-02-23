@@ -142,16 +142,23 @@ app.delete('/attendance', async(req, res) => {
 **************
 */
 app.get('/export', async(req, res) => {
-	db.get_csv_export_data().then(rows => {
+	db.get_csv_export_data()
+	.then(rows => {
+		for (let i = 0; i < rows.length; ++i)
+			rows[i].date = new Date(rows[i].date).toDateString();
+		return rows;
+	})
+	.then(rows => {
 		res.setHeader('Content-Type', 'text/csv');
 		res.setHeader('Content-Disposition', 'attachment; filename=\"' + 'famnm-attendance-' + Date.now() + '.csv\"');
 		res.setHeader('Cache-Control', 'no-cache');
 		res.setHeader('Pragma', 'no-cache');
 
 		stringify(rows, { header: true })
-		.pipe(res);	  
+		.pipe(res);
 	})
+	.catch(console.log);
 })
 
-app.listen(port, () => console.log(`app listening at https:\/\/localhost:${port}!`))
+app.listen(port, () => console.log(`app listening at http:\/\/localhost:${port}!`))
 
