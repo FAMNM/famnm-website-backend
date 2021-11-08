@@ -1,11 +1,16 @@
-from flask import Flask
+from flask import Flask, jsonify
+
+from utilities import *
 
 app = Flask(__name__)
 
 
 @app.route('/meeting/types')
 def meeting_types():
-    return 'Hello, World!'
+    results = db_execute('SELECT meeting_type FROM meeting_types')
+    meeting_types = [meeting_type for (meeting_type,) in results]
+
+    return jsonify(meeting_types)
 
 
 @app.route('/meeting/validate')
