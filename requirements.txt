@@ -1,4 +1,5 @@
-flask          # Web framework and development server
-watchdog       # Autoreload development server when changes are made
-python-dotenv  # Load .env (and .flaskenv if applicable)
-gunicorn       # Production web server
+flask            # Web framework and development server`
+watchdog         # Autoreload development server when changes are made
+python-dotenv    # Load .env (and .flaskenv if applicable)
+gunicorn         # Production web server
+psycopg2-binary  # PostgreSQL client
