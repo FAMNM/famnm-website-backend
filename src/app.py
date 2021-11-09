@@ -1,6 +1,7 @@
 import flask
 from flask import Flask, request
 from werkzeug.wrappers import response
+import datetime
 
 from utilities import *
 
@@ -43,7 +44,8 @@ def validate_meeting():
             already_exists = cur.rowcount > 0
 
         # Check for unrecognized uniqnames
-        new_members = [uniqname for uniqname in meeting['attendees'] if not member_in_database(uniqname, conn)]
+        new_members = [uniqname for uniqname in meeting['attendees']
+                       if not member_in_database(uniqname, conn)]
 
     return {
         'already_exists': already_exists,
@@ -95,7 +97,7 @@ def get_meeting():
                     (uniqname,)
                 )
                 meeting_ids = [meeting_id for (meeting_id,) in cur.fetchall()]
-            
+
             return flask.jsonify([get_meeting_info(meeting_id, conn) for meeting_id in meeting_ids])
         else:
             # Get all meetings
@@ -105,10 +107,19 @@ def get_meeting():
                     'FROM meetings'
                 )
                 meeting_ids = [meeting_id for (meeting_id,) in cur.fetchall()]
-            
+
             return flask.jsonify([get_meeting_info(meeting_id, conn) for meeting_id in meeting_ids])
 
 
-@app.route('/active')
+@app.route('/member')
+def get_member():
+    return 'Hello, world!'
+
+
+@app.route('/member/active')
 def get_active_members():
-    return 'Hello, World!'
+    with db_connection() as conn:
+        active_members = [member for member in all_member_info(
+            conn) if member['active']]
+
+    return flask.jsonify(active_members)
