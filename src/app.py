@@ -1,4 +1,6 @@
-from flask import Flask, jsonify, request
+import flask
+from flask import Flask, request
+from werkzeug.wrappers import response
 
 from utilities import *
 
@@ -10,7 +12,7 @@ def meeting_types():
     results = db_execute('SELECT meeting_type FROM meeting_types')
     meeting_types = [meeting_type for (meeting_type,) in results]
 
-    return jsonify(meeting_types)
+    return flask.jsonify(meeting_types)
 
 
 @app.route('/meeting/validate')
@@ -23,7 +25,7 @@ def validate_meeting():
         with conn.cursor() as cur:
             if id is None:
                 cur.execute(
-                    'SELECT COUNT(*) '
+                    'SELECT * '
                     'FROM meetings '
                     'WHERE meeting_type = %s '
                     'AND meeting_date = %s',
@@ -31,33 +33,21 @@ def validate_meeting():
                 )
             else:
                 cur.execute(
-                    'SELECT COUNT(*) '
+                    'SELECT * '
                     'FROM meetings '
                     'WHERE meeting_type = %s '
                     'AND meeting_date = %s '
                     'AND meeting_id != %s',
                     (meeting['meeting_type'], meeting['meeting_date'], id)
                 )
-            (identical_meetings,) = cur.fetchone()
+            already_exists = cur.rowcount > 0
 
         # Check for unrecognized uniqnames
-        new_uniqnames = list()
-        for uniqname in meeting['attendees']:
-            with conn.cursor() as cur:
-                cur.execute(
-                    'SELECT COUNT(*) '
-                    'FROM members '
-                    'WHERE uniqname = %s',
-                    (uniqname,)
-                )
-                (attendee_exists,) = cur.fetchone()
-            
-            if attendee_exists == 0:
-                new_uniqnames.append(uniqname)
+        new_members = [uniqname for uniqname in meeting['attendees'] if not member_in_database(uniqname, conn)]
 
     return {
-        'already_exists': identical_meetings > 0,
-        'new_uniqnames': new_uniqnames
+        'already_exists': already_exists,
+        'new_uniqnames': new_members
     }
 
 
@@ -77,18 +67,46 @@ def delete_meeting(id):
 
 
 @app.route('/meeting')
-def get_all_meetings():
-    return 'Hello, World!'
+def get_meeting():
+    meeting_id = request.args.get('id')
+    uniqname = request.args.get('uniqname')
 
+    with db_connection() as conn:
+        if meeting_id is not None and uniqname is not None:
+            return 'id and uniqname cannot be specified in the same request', 400
+        elif meeting_id is not None:
+            # Get meeting by ID
+            response = get_meeting_info(meeting_id, conn)
 
-@app.route('/meeting/id/<int:id>')
-def get_meeting_by_id(id):
-    return 'Hello, World!'
+            if response is not None:
+                return flask.jsonify(response)
+            else:
+                return f'No meeting with id {meeting_id}', 404
+        elif uniqname is not None:
+            # Get meetings attended by uniqname
+            if not member_in_database(uniqname, conn):
+                return f'{uniqname} has no records', 404
 
-
-@app.route('/meeting/uniqname/<string:uniqname>')
-def get_meetings_by_uniqname(id):
-    return 'Hello, World!'
+            with conn.cursor() as cur:
+                cur.execute(
+                    'SELECT meeting_id '
+                    'FROM attendance '
+                    'WHERE uniqname = %s',
+                    (uniqname,)
+                )
+                meeting_ids = [meeting_id for (meeting_id,) in cur.fetchall()]
+            
+            return flask.jsonify([get_meeting_info(meeting_id, conn) for meeting_id in meeting_ids])
+        else:
+            # Get all meetings
+            with conn.cursor() as cur:
+                cur.execute(
+                    'SELECT meeting_id '
+                    'FROM meetings'
+                )
+                meeting_ids = [meeting_id for (meeting_id,) in cur.fetchall()]
+            
+            return flask.jsonify([get_meeting_info(meeting_id, conn) for meeting_id in meeting_ids])
 
 
 @app.route('/active')

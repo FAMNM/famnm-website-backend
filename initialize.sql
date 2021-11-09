@@ -22,5 +22,5 @@ CREATE TABLE attendance (
 
 CREATE TABLE semesters (
     starting_date DATE PRIMARY KEY,
-    semester_name TEXT NOT NULL,
+    semester_name TEXT NOT NULL
 );
