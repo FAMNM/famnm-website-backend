@@ -158,8 +158,12 @@ def get_active_members():
 @auth.login_required
 def post_member():
     member = request.get_json()
-    uniqname = member['uniqname']
-    mentor = member['mentor']
+
+    try:
+        uniqname = member['uniqname']
+        mentor = member['mentor']
+    except KeyError as e:
+        return f'{e} not in JSON body', 400
 
     with db_connection(writable=True) as conn:
         if member_in_database(uniqname, conn):
