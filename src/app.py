@@ -136,3 +136,34 @@ def get_active_members():
             conn) if member['active']]
 
     return flask.jsonify(active_members)
+
+
+@app.route('/member', methods=['POST', 'PUT'])
+def post_member():
+    member = request.get_json()
+    uniqname = member['uniqname']
+    mentor = member['mentor']
+
+    with db_connection(writable=True) as conn:
+        if member_in_database(uniqname, conn):
+            if request.method == 'POST':
+                return f'{uniqname} already has a record (use PUT to update existing records)', 400
+            else:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        'UPDATE members '
+                        'SET mentor = %s '
+                        'WHERE uniqname = %s',
+                        (mentor, uniqname)
+                    )
+
+                return '', 204
+        else:
+            with conn.cursor() as cur:
+                cur.execute(
+                    'INSERT INTO members '
+                    'VALUES (%s, %s)',
+                    (uniqname, mentor)
+                )
+
+            return '', 201
