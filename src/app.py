@@ -1,11 +1,24 @@
+import os
+
 import flask
 from flask import Flask, request
-from werkzeug.wrappers import response
-import datetime
+from flask_httpauth import HTTPBasicAuth
 
 from utilities import *
 
 app = Flask(__name__)
+auth = HTTPBasicAuth()
+
+
+@auth.verify_password
+def verify_password(username, password):
+    famnm_passphrase = os.environ.get('FAMNM_PASSPHRASE')
+
+    if famnm_passphrase is not None:
+        return username.casefold() == 'famnm'.casefold() and password.casefold() == famnm_passphrase.casefold()
+    else:
+        # FAMNM_PASSPHRASE is not set
+        return False
 
 
 @app.route('/meeting/types')
@@ -53,21 +66,6 @@ def validate_meeting():
     }
 
 
-@app.route('/meeting', methods=['POST'])
-def post_meeting():
-    return 'Hello, World!'
-
-
-@app.route('/meeting/id/<int:id>', methods=['PUT'])
-def put_meeting(id):
-    return 'Hello, World!'
-
-
-@app.route('/meeting/id/<int:id>', methods=['DELETE'])
-def delete_meeting(id):
-    return 'Hello, World!'
-
-
 @app.route('/meeting')
 def get_meeting():
     meeting_id = request.args.get('id')
@@ -111,6 +109,24 @@ def get_meeting():
             return flask.jsonify([get_meeting_info(meeting_id, conn) for meeting_id in meeting_ids])
 
 
+@app.route('/meeting', methods=['POST'])
+@auth.login_required
+def post_meeting():
+    return 'Hello, World!'
+
+
+@app.route('/meeting/id/<int:id>', methods=['PUT'])
+@auth.login_required
+def put_meeting(id):
+    return 'Hello, World!'
+
+
+@app.route('/meeting/id/<int:id>', methods=['DELETE'])
+@auth.login_required
+def delete_meeting(id):
+    return 'Hello, World!'
+
+
 @app.route('/member')
 def get_member():
     uniqname = request.args.get('uniqname')
@@ -139,6 +155,7 @@ def get_active_members():
 
 
 @app.route('/member', methods=['POST', 'PUT'])
+@auth.login_required
 def post_member():
     member = request.get_json()
     uniqname = member['uniqname']
