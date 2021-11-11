@@ -47,11 +47,50 @@ def meeting_info(meeting_id, conn):
         attendees = [uniqname for (uniqname,) in cur.fetchall()]
 
     return {
-        'meeting_id': meeting_id,
+        'id': meeting_id,
         'meeting_type': meeting_type,
         'meeting_date': meeting_date.isoformat(),
         'attendees': attendees
     }
+
+
+def extract_meeting_info(meeting):
+    """
+    Extract meeting info from a JSON body.
+
+    Raises ValueError if the meeting is invalid.
+    Returns `meeting_id`, `meeting_type`, `meeting_date`, `attendees`.
+    """
+    try:
+        meeting_id = meeting.get('id')
+        meeting_type = str(meeting['meeting_type'])
+        meeting_date = datetime.date.fromisoformat(meeting['meeting_date'])
+        attendees = list(meeting['attendees'])
+    except KeyError as e:
+        raise ValueError(f'{e} not in JSON body')
+    except ValueError as e:
+        raise ValueError(str(e))
+    except TypeError as e:
+        raise ValueError('\'attendees\' must be an array')
+
+    if meeting_id is not None and type(meeting_id) is not int:
+        return '\'id\' must be an integer', 400
+
+    return meeting_id, meeting_type, meeting_date, attendees
+
+
+def meeting_in_database(meeting_id, conn):
+    """Returns whether the member is in the database."""
+    with conn.cursor() as cur:
+        cur.execute(
+            'SELECT * '
+            'FROM meetings '
+            'WHERE meeting_id = %s',
+            (meeting_id,)
+        )
+        meeting_exists = cur.rowcount > 0
+
+    return meeting_exists
 
 
 def member_in_database(uniqname, conn):
