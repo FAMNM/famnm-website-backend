@@ -23,8 +23,13 @@ def verify_password(username, password):
 
 @app.route('/meeting/types')
 def meeting_types():
-    results = db_execute('SELECT meeting_type FROM meeting_types')
-    meeting_types = [meeting_type for (meeting_type,) in results]
+    with db_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                'SELECT meeting_type '
+                'FROM meeting_types'
+            )
+        meeting_types = [meeting_type for (meeting_type,) in cur.fetchall()]
 
     return flask.jsonify(meeting_types)
 
