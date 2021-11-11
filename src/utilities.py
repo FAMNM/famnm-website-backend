@@ -22,7 +22,7 @@ def db_execute(query, params=None):
             return cur.fetchall()
 
 
-def get_meeting_info(meeting_id, conn):
+def meeting_info(meeting_id, conn):
     """Returns a dictionary of the meeting's information."""
     with conn.cursor() as cur:
         cur.execute(
@@ -47,6 +47,7 @@ def get_meeting_info(meeting_id, conn):
         attendees = [uniqname for (uniqname,) in cur.fetchall()]
 
     return {
+        'meeting_id': meeting_id,
         'meeting_type': meeting_type,
         'meeting_date': meeting_date.isoformat(),
         'attendees': attendees

@@ -76,7 +76,7 @@ def get_meeting():
             return 'id and uniqname cannot be specified in the same request', 400
         elif meeting_id is not None:
             # Get meeting by ID
-            response = get_meeting_info(meeting_id, conn)
+            response = meeting_info(meeting_id, conn)
 
             if response is not None:
                 return flask.jsonify(response)
@@ -96,7 +96,7 @@ def get_meeting():
                 )
                 meeting_ids = [meeting_id for (meeting_id,) in cur.fetchall()]
 
-            return flask.jsonify([get_meeting_info(meeting_id, conn) for meeting_id in meeting_ids])
+            return flask.jsonify([meeting_info(meeting_id, conn) for meeting_id in meeting_ids])
         else:
             # Get all meetings
             with conn.cursor() as cur:
@@ -106,7 +106,7 @@ def get_meeting():
                 )
                 meeting_ids = [meeting_id for (meeting_id,) in cur.fetchall()]
 
-            return flask.jsonify([get_meeting_info(meeting_id, conn) for meeting_id in meeting_ids])
+            return flask.jsonify([meeting_info(meeting_id, conn) for meeting_id in meeting_ids])
 
 
 @app.route('/meeting', methods=['POST'])
