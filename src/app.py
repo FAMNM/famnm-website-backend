@@ -87,7 +87,7 @@ def get_meeting():
         elif uniqname is not None:
             # Get meetings attended by uniqname
             if not member_in_database(uniqname, conn):
-                return f'{uniqname} has no records', 404
+                return f'Records not found for {uniqname}', 404
 
             with conn.cursor() as cur:
                 cur.execute(
@@ -113,7 +113,20 @@ def get_meeting():
 
 @app.route('/member')
 def get_member():
-    return 'Hello, world!'
+    uniqname = request.args.get('uniqname')
+
+    with db_connection() as conn:
+        if uniqname is not None:
+            # Get member by uniqname
+            result = member_info([uniqname], conn)
+
+            if len(result) == 1:
+                return result[0]
+            else:
+                return f'Records not found for {uniqname}', 404
+        else:
+            # Get all members
+            return flask.jsonify(all_member_info(conn))
 
 
 @app.route('/member/active')
