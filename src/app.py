@@ -189,10 +189,21 @@ def post_meeting():
     return '', (201 if created_new else 204)
 
 
-@app.route('/meeting/id/<int:id>', methods=['DELETE'])
+@app.route('/meeting/id/<int:meeting_id>', methods=['DELETE'])
 @auth.login_required
-def delete_meeting(id):
-    return 'Hello, World!'
+def delete_meeting(meeting_id):
+    with db_connection(writable=True) as conn:
+        if not meeting_in_database(meeting_id, conn):
+            flask.abort(404, f'Meeting {meeting_id} not found')
+
+        with conn.cursor() as cur:
+            cur.execute(
+                'DELETE FROM meetings '
+                'WHERE meeting_id = %s',
+                (meeting_id,)
+            )
+
+    return '', 204
 
 
 @app.route('/member')
