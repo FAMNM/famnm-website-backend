@@ -112,6 +112,13 @@ heroku pg:psql
 
 ## Environmental Variables
 
+This application uses the following variables for the following purposes:
+
+| Name               | Use                                                    |
+| :----------------- | :----------------------------------------------------- |
+| `DATABASE_URL`     | The URL of the PostgreSQL database                     |
+| `FAMNM_PASSPHRASE` | The password for HTTP Basic Auth (username is "famnm") |
+
 For local development, you can set environmental variables by making a `.env` file in the following format:
 
 ```.env
