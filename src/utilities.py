@@ -2,12 +2,59 @@ import psycopg2
 import os
 import datetime
 
+import flask
+
 
 def db_connection(writable=False):
     """Returns a connection to the database."""
     conn = psycopg2.connect(os.environ.get('DATABASE_URL'))
     conn.readonly = not writable
     return conn
+
+
+def extract_meeting_info():
+    """
+    Extract meeting info from the JSON in the request body.
+
+    Raises ValueError if the meeting is invalid.
+    Returns `meeting_id`, `meeting_type`, `meeting_date`, `attendees`.
+    """
+    meeting = flask.request.get_json()
+
+    try:
+        meeting_type = str(meeting['meeting_type'])
+    except KeyError as e:
+        flask.abort(400, f'{e} not in JSON body')
+
+    try:
+        meeting_date = datetime.date.fromisoformat(meeting['meeting_date'])
+    except KeyError as e:
+        flask.abort(400, f'{e} not in JSON body')
+    except ValueError as e:
+        flask.abort(400, str(e))
+
+    try:
+        attendees = list(meeting['attendees'])
+    except KeyError as e:
+        flask.abort(400, f'{e} not in JSON body')
+    except TypeError as e:
+        flask.abort(400, '\'attendees\' must be an array')
+
+    return meeting_type, meeting_date, attendees
+
+
+def meeting_in_database(meeting_id, conn):
+    """Returns whether the member is in the database."""
+    with conn.cursor() as cur:
+        cur.execute(
+            'SELECT * '
+            'FROM meetings '
+            'WHERE meeting_id = %s',
+            (meeting_id,)
+        )
+        meeting_exists = cur.rowcount > 0
+
+    return meeting_exists
 
 
 def meeting_info(meeting_id, conn):
@@ -40,45 +87,6 @@ def meeting_info(meeting_id, conn):
         'meeting_date': meeting_date.isoformat(),
         'attendees': attendees
     }
-
-
-def extract_meeting_info(meeting):
-    """
-    Extract meeting info from a JSON body.
-
-    Raises ValueError if the meeting is invalid.
-    Returns `meeting_id`, `meeting_type`, `meeting_date`, `attendees`.
-    """
-    try:
-        meeting_id = meeting.get('id')
-        meeting_type = str(meeting['meeting_type'])
-        meeting_date = datetime.date.fromisoformat(meeting['meeting_date'])
-        attendees = list(meeting['attendees'])
-    except KeyError as e:
-        raise ValueError(f'{e} not in JSON body')
-    except ValueError as e:
-        raise ValueError(str(e))
-    except TypeError as e:
-        raise ValueError('\'attendees\' must be an array')
-
-    if meeting_id is not None and type(meeting_id) is not int:
-        return '\'id\' must be an integer', 400
-
-    return meeting_id, meeting_type, meeting_date, attendees
-
-
-def meeting_in_database(meeting_id, conn):
-    """Returns whether the member is in the database."""
-    with conn.cursor() as cur:
-        cur.execute(
-            'SELECT * '
-            'FROM meetings '
-            'WHERE meeting_id = %s',
-            (meeting_id,)
-        )
-        meeting_exists = cur.rowcount > 0
-
-    return meeting_exists
 
 
 def member_in_database(uniqname, conn):
@@ -155,7 +163,39 @@ def all_member_info(conn):
     return member_info(all_uniqnames, conn)
 
 
-def _semester(conn, ending_date):
+def insert_meeting_type(meeting_type, conn):
+    with conn.cursor() as cur:
+        cur.execute(
+            'INSERT INTO meeting_types(meeting_type) '
+            'VALUES (%s) '
+            'ON CONFLICT DO NOTHING',
+            (meeting_type,)
+        )
+
+
+def insert_attendance(meeting_id, attendees, conn):
+    for uniqname in attendees:
+        # Add any new uniqnames to the database
+        if not member_in_database(uniqname, conn):
+            with conn.cursor() as cur:
+                cur.execute(
+                    'INSERT INTO members(uniqname) '
+                    'VALUES (%s)',
+                    (uniqname,)
+                )
+
+        # Add attendance
+        with conn.cursor() as cur:
+            cur.execute(
+                'INSERT INTO attendance(meeting_id, uniqname) '
+                'VALUES (%s, %s) '
+                'ON CONFLICT DO NOTHING',
+                (meeting_id, uniqname)
+            )
+
+
+def semester(conn, ending_date):
+    """Returns the starting and ending date of the semester with the given ending date."""
     with conn.cursor() as cur:
         cur.execute(
             'SELECT MAX(starting_date) '
@@ -170,11 +210,11 @@ def _semester(conn, ending_date):
 
 def current_semester(conn):
     """Returns the starting and ending date of the current semester."""
-    return _semester(conn, datetime.date.today())
+    return semester(conn, datetime.date.today())
 
 
 def last_semester(conn):
     """Returns the starting and ending date of last semester."""
     current_semester_start, _ = current_semester(conn)
 
-    return _semester(conn, current_semester_start - datetime.timedelta(days=1))
+    return semester(conn, current_semester_start - datetime.timedelta(days=1))
