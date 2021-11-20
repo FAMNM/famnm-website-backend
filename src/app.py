@@ -23,7 +23,7 @@ def verify_password(username, password):
         return False
 
 
-@app.route('api/v2/meeting')
+@app.route('/api/v2/meeting')
 def get_all_meetings():
     with db_connection() as conn:
         with conn.cursor() as cur:
@@ -36,7 +36,7 @@ def get_all_meetings():
         return flask.jsonify([meeting_info(meeting_id, conn) for meeting_id in meeting_ids])
 
 
-@app.route('api/v2/meeting', methods=['POST', 'PUT'])
+@app.route('/api/v2/meeting', methods=['POST', 'PUT'])
 @auth.login_required
 def create_meeting():
     meeting_type, meeting_date, attendees = extract_meeting_info()
@@ -64,7 +64,7 @@ def create_meeting():
     return '', 201
 
 
-@app.route('api/v2/meeting/id/<int:meeting_id>')
+@app.route('/api/v2/meeting/id/<int:meeting_id>')
 def get_meeting_by_id(meeting_id):
     with db_connection() as conn:
         response = meeting_info(meeting_id, conn)
@@ -75,7 +75,7 @@ def get_meeting_by_id(meeting_id):
             flask.abort(404, f'No meeting with id {meeting_id}')
 
 
-@app.route('api/v2/meeting/id/<int:meeting_id>', methods=['PUT'])
+@app.route('/api/v2/meeting/id/<int:meeting_id>', methods=['PUT'])
 @auth.login_required
 def update_meeting(meeting_id):
     meeting_type, meeting_date, attendees = extract_meeting_info()
@@ -101,7 +101,7 @@ def update_meeting(meeting_id):
     return '', 204
 
 
-@app.route('api/v2/meeting/id/<int:meeting_id>', methods=['DELETE'])
+@app.route('/api/v2/meeting/id/<int:meeting_id>', methods=['DELETE'])
 @auth.login_required
 def delete_meeting(meeting_id):
     with db_connection(writable=True) as conn:
@@ -118,7 +118,7 @@ def delete_meeting(meeting_id):
     return '', 204
 
 
-@app.route('api/v2/meeting/uniqname/<uniqname>')
+@app.route('/api/v2/meeting/uniqname/<uniqname>')
 def get_meeting_by_uniqname(uniqname):
     with db_connection() as conn:
         # Get meetings attended by uniqname
@@ -137,7 +137,7 @@ def get_meeting_by_uniqname(uniqname):
         return flask.jsonify([meeting_info(meeting_id, conn) for meeting_id in meeting_ids])
 
 
-@app.route('api/v2/meeting/validate')
+@app.route('/api/v2/meeting/validate')
 def validate_meeting():
     try:
         meeting_type, meeting_date, attendees = extract_meeting_info()
@@ -166,7 +166,7 @@ def validate_meeting():
     }
 
 
-@app.route('api/v2/meeting/validate/id/<id:meeting_id>')
+@app.route('/api/v2/meeting/validate/id/<int:meeting_id>')
 def validate_meeting_by_id(meeting_id):
     try:
         meeting_type, meeting_date, attendees = extract_meeting_info()
@@ -196,7 +196,7 @@ def validate_meeting_by_id(meeting_id):
     }
 
 
-@app.route('api/v2/meeting/types')
+@app.route('/api/v2/meeting/types')
 def get_meeting_types():
     with db_connection() as conn:
         with conn.cursor() as cur:
@@ -204,18 +204,19 @@ def get_meeting_types():
                 'SELECT meeting_type '
                 'FROM meeting_types'
             )
-        meeting_types = [meeting_type for (meeting_type,) in cur.fetchall()]
+            meeting_types = [meeting_type for (
+                meeting_type,) in cur.fetchall()]
 
     return flask.jsonify(meeting_types)
 
 
-@app.route('api/v2/member')
+@app.route('/api/v2/member')
 def get_all_members():
     with db_connection() as conn:
         return flask.jsonify(all_member_info(conn))
 
 
-@app.route('api/v2/member/uniqname/<uniqname>')
+@app.route('/api/v2/member/uniqname/<uniqname>')
 def get_member_by_uniqname(uniqname):
     with db_connection() as conn:
         result = member_info([uniqname], conn)
@@ -226,7 +227,7 @@ def get_member_by_uniqname(uniqname):
             flask.abort(404, f'Records not found for {uniqname}')
 
 
-@app.route('api/v2/member/uniqname/<uniqname>', methods=['POST', 'PUT'])
+@app.route('/api/v2/member/uniqname/<uniqname>', methods=['POST', 'PUT'])
 @auth.login_required
 def create_or_update_member(uniqname):
     try:
@@ -240,9 +241,9 @@ def create_or_update_member(uniqname):
                 flask.abort(
                     400, f'{uniqname} already has a record (use PUT to update existing records)')
 
-                created_new_member = False
-            else:
-                created_new_member = True
+            created_new_member = False
+        else:
+            created_new_member = True
 
         with conn.cursor() as cur:
             cur.execute(
@@ -256,7 +257,7 @@ def create_or_update_member(uniqname):
     return '', (201 if created_new_member else 204)
 
 
-@app.route('api/v2/member/active')
+@app.route('/api/v2/member/active')
 def get_active_members():
     with db_connection() as conn:
         active_members = [member for member in all_member_info(
