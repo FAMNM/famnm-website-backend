@@ -139,7 +139,7 @@ def get_meeting_by_uniqname(uniqname):
         return flask.jsonify([meeting_info(meeting_id, conn) for meeting_id in meeting_ids])
 
 
-@app.route('/api/v2/meeting/validate')
+@app.route('/api/v2/meeting/validate', methods=['POST', 'PUT'])
 def validate_meeting():
     try:
         meeting_type, meeting_date, attendees = extract_meeting_info()
@@ -168,7 +168,7 @@ def validate_meeting():
     }
 
 
-@app.route('/api/v2/meeting/validate/id/<int:meeting_id>')
+@app.route('/api/v2/meeting/validate/id/<int:meeting_id>', methods=['PUT'])
 def validate_meeting_by_id(meeting_id):
     try:
         meeting_type, meeting_date, attendees = extract_meeting_info()
