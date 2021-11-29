@@ -3,11 +3,13 @@ import os
 import flask
 from flask import Flask, request
 from flask_httpauth import HTTPBasicAuth
+from flask_cors import CORS
 
 from utilities import *
 
 app = Flask(__name__)
 auth = HTTPBasicAuth()
+CORS(app)
 
 
 # This function is called before all endpoints annotated with `@auth.login_required`
