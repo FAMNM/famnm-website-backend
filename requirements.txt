@@ -1,4 +1,4 @@
-flask            # Web framework and development server`
+flask            # Web framework and development server
 Flask-HTTPAuth   # Basic Auth
 Flask-Cors       # Cross-Origin Resource Sharing
 watchdog         # Autoreload development server when changes are made
