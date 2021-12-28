@@ -115,8 +115,9 @@ def member_info(uniqnames, conn):
                 cur.execute(
                     'SELECT * '
                     'FROM attendance '
+                    'INNER JOIN meetings ON attendance.meeting_id = meetings.meeting_id '
                     'WHERE uniqname = %s '
-                    'AND EXISTS (SELECT * FROM meetings WHERE meeting_date BETWEEN %s AND %s)',
+                    'AND meetings.meeting_date BETWEEN %s AND %s',
                     (uniqname, current_semester_start, current_semester_end)
                 )
                 attendance_this_semester = cur.rowcount
@@ -125,8 +126,9 @@ def member_info(uniqnames, conn):
                 cur.execute(
                     'SELECT * '
                     'FROM attendance '
+                    'INNER JOIN meetings ON attendance.meeting_id = meetings.meeting_id '
                     'WHERE uniqname = %s '
-                    'AND EXISTS (SELECT * FROM meetings WHERE meeting_date BETWEEN %s AND %s)',
+                    'AND meetings.meeting_date BETWEEN %s AND %s',
                     (uniqname, last_semester_start, last_semester_end)
                 )
                 attendance_last_semester = cur.rowcount
