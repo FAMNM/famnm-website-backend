@@ -1,5 +1,6 @@
 CREATE TABLE meeting_types (
-    meeting_type TEXT PRIMARY KEY
+    meeting_type TEXT PRIMARY KEY,
+    CONSTRAINT no_default_meeting_type CHECK (meeting_type <> '------')
 );
 
 CREATE TABLE members (
